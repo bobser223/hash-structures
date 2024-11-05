@@ -53,14 +53,14 @@ public:
      *  |look to the LinkedList_dict for understanding structure|
      */
 
-    int getSize() const {
+    [[nodiscard]] int getSize() const {
         return element_count;
     }
     /*
      * @return count of elements
      */
 
-    int getTrueSize() const {
+    [[nodiscard]] int getTrueSize() const {
         return real_size;
     }
     /*

@@ -45,17 +45,21 @@ public:
      * goes to the last element and changes last element
      * next pointer to new ListEl, now new ListEl is the last element
      * P.S if there is 0 elements first_el = new ListEl
+     * @param key to add
+     * @param value to add
      */
 
 
     bool is_in(key_type key);
     /*
      * checks is key int the LinkedList_dict
+     * @param value to check
      */
 
     void pop(key_type key);
     /*
      * deletes ListEl with given key
+     * @param value to delete
      */
 
     int get_size(){
@@ -79,35 +83,19 @@ public:
      * I used it to check first_el is it nullptr or not;
      */
 
-    const value_type& operator[](key_type key) const{
-        if (size == 0){
-            throw std::logic_error("no elements here!!!");
-//            return false;
-        } else {
+    const value_type& operator[](key_type key) const;
+    /*
+     * finds value by key
+     * for copying value
+     * value_type value_var = list[key]
+     */
 
-            ListEl<key_type, value_type>* curr_el = first_el;
-            while (curr_el != nullptr){
-                if (curr_el->key == key && !curr_el->is_empty) return curr_el ->value;
-                curr_el = curr_el->next_pointer;
-            }
-            throw std::logic_error("no element here!!!");
-        }
-    }
-
-    value_type& operator[](key_type key){
-        if (size == 0){
-            throw std::logic_error("no elements here!!!");
-//            return false;
-        } else {
-
-            ListEl<key_type, value_type>* curr_el = first_el;
-            while (curr_el != nullptr){
-                if (curr_el->key == key && !curr_el->is_empty) return curr_el ->value;
-                curr_el = curr_el->next_pointer;
-            }
-            throw std::logic_error("no element here!!!");
-        }
-    }
+    value_type& operator[](key_type key);
+    /*
+    * finds value by key
+    * for changing value
+    * list[key] = value2;
+    */
 
     void print(std::ostream& out = std::cout) const{
         ListEl<key_type, value_type>* curr_el = first_el;
@@ -121,32 +109,28 @@ public:
         lst.print(out);
         return out;
     }
+    /*
+     * overloading cout operator <<
+     */
 
 private:
     Couple<key_type,value_type> get_couple(int index);
+    /*
+     * finds element by index and returns struct with key and value
+     * this function needed for copying this list to another
+     * @param index
+     * @return struct couple(key, value)
+     */
 
-    void find_element_with_key(key_type key, ListEl<key_type, value_type>*& previous_element, ListEl<key_type, value_type>*& element_to_delete) const {
-        if (size == 0){
-            throw std::logic_error("no elements here!!!");
-        }
-
-        previous_element = nullptr;
-        element_to_delete = nullptr;
-        ListEl<key_type, value_type>* curr_el = first_el;
-
-        while (curr_el != nullptr){
-            if (curr_el->key == key && !curr_el->is_empty){
-                element_to_delete = curr_el;
-                break;
-            }
-            previous_element = curr_el;
-            curr_el = curr_el->next_pointer;
-        }
-
-        if (element_to_delete == nullptr){
-            throw std::logic_error("Element not found!");
-        }
-    }
+    void find_element_with_key(key_type key, ListEl<key_type, value_type>*& previous_element, ListEl<key_type, value_type>*& element_to_delete) const;
+    /*
+     * finds element with present key and previous element to it.
+     * I've used it for finding elements to delete.
+     * @param key
+     * @param previous_element
+     * @param element_to_delete
+     * no returning but changing previous_element and element_to_delete
+     */
     template <typename T>
     friend class HashSet;
 
@@ -156,8 +140,9 @@ private:
 // public
 template<typename key_type, typename value_type>
 void LinkedList_dict<key_type, value_type>::add(key_type key, value_type value){
-    // do nothing
-    if(is_in(key))  return;
+
+    if(is_in(key))  return; // do nothing
+
     ListEl<key_type, value_type>* new_el = new ListEl<key_type, value_type>;
     new_el -> key = key;
     new_el -> value = value;
@@ -220,6 +205,35 @@ void LinkedList_dict<key_type, value_type>::pop(key_type key){
     size--;
 }
 
+template<typename key_type, typename value_type>
+const value_type& LinkedList_dict<key_type, value_type>::operator[](key_type key) const{
+    if (size == 0){
+        throw std::logic_error("no elements here!!!");
+    } else {
+
+        ListEl<key_type, value_type>* curr_el = first_el;
+        while (curr_el != nullptr){
+            if (curr_el->key == key && !curr_el->is_empty) return curr_el ->value;
+            curr_el = curr_el->next_pointer;
+        }
+        throw std::logic_error("no element here!!!");
+    }
+}
+
+template<typename key_type, typename value_type>
+value_type& LinkedList_dict<key_type, value_type>::operator[](key_type key){
+    if (size == 0){
+        throw std::logic_error("no elements here!!!");
+    } else {
+
+        ListEl<key_type, value_type>* curr_el = first_el;
+        while (curr_el != nullptr){
+            if (curr_el->key == key && !curr_el->is_empty) return curr_el ->value;
+            curr_el = curr_el->next_pointer;
+        }
+        throw std::logic_error("no element here!!!");
+    }
+}
 
 
 // private
@@ -244,5 +258,28 @@ Couple<key_type,value_type> LinkedList_dict<key_type, value_type>::get_couple(in
 
 }
 
+template<typename key_type, typename value_type>
+void LinkedList_dict<key_type, value_type>::find_element_with_key(key_type key, ListEl<key_type, value_type>*& previous_element, ListEl<key_type, value_type>*& element_to_delete) const {
+    if (size == 0){
+        throw std::logic_error("no elements here!!!");
+    }
+
+    previous_element = nullptr;
+    element_to_delete = nullptr;
+    ListEl<key_type, value_type>* curr_el = first_el;
+
+    while (curr_el != nullptr){
+        if (curr_el->key == key && !curr_el->is_empty){
+            element_to_delete = curr_el;
+            break;
+        }
+        previous_element = curr_el;
+        curr_el = curr_el->next_pointer;
+    }
+
+    if (element_to_delete == nullptr){
+        throw std::logic_error("Element not found!");
+    }
+}
 
 #endif //LEARNING_LINKEDLIST_DICT_H

@@ -211,7 +211,7 @@ protected:
         if (num == 2 || num == 3) return true;
         if (num % 2 == 0 || num % 3 == 0) return false;
 
-        int sqrt_num = static_cast<long long>(std::sqrt(num)); //FIXME !!!!!!!!!!!!!!! ststic_cast<int>
+        int sqrt_num = static_cast<long long>(std::sqrt(num));
         for (long long i = 5; i <= sqrt_num; i += 6) {
             if (num % i == 0 || num % (i + 2) == 0)
                 return false;

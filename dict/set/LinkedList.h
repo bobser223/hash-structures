@@ -34,25 +34,7 @@ public:
         }
     }
 
-    void add(var_type var){
-        if(is_in(var))  return;
-        ListEl<var_type>* new_el = new ListEl<var_type>;
-        new_el -> var = var;
-        new_el -> next_pointer = nullptr;
-        new_el ->is_empty = false;
-        if (size == 0){
-            first_el = new_el;
-        } else {
-            ListEl<var_type>* curr_el = first_el;
-            while (curr_el -> next_pointer != nullptr){
-                curr_el = curr_el -> next_pointer;
-            }
-            curr_el -> next_pointer = new_el;
-        }
-
-        size ++;
-
-    }
+    void add(var_type var);
 
     bool is_in(var_type var){
         if (size == 0){
@@ -188,4 +170,27 @@ private:
 };
 
 
+template<typename var_type>
+void LinkedList<var_type>::add(var_type var){
+    if(is_in(var))  return;
+    ListEl<var_type>* new_el = new ListEl<var_type>;
+    new_el -> var = var;
+    new_el -> next_pointer = nullptr;
+    new_el ->is_empty = false;
+    if (size == 0){
+        first_el = new_el;
+    } else {
+        ListEl<var_type>* curr_el = first_el;
+        while (curr_el -> next_pointer != nullptr){
+            curr_el = curr_el -> next_pointer;
+        }
+        curr_el -> next_pointer = new_el;
+    }
+
+    size ++;
+
+}
+
+
 #endif //LEARNING_LINKEDLIST_H
+
