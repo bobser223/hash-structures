@@ -118,8 +118,9 @@ protected:
         set.print(out);
         return out;
     }
-}; // end of the class
+}; // End of the class
 
+// methods implementation
 
 template<typename var_type>
 HashSet<var_type>::HashSet() {
