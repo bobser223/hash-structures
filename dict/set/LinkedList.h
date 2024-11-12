@@ -25,14 +25,8 @@ private:
 public:
 
     LinkedList() : first_el(nullptr), size(0) {}
-    ~LinkedList(){
-        ListEl<var_type>* curr_el = first_el;
-        while (curr_el != nullptr){
-            ListEl<var_type>* temp = curr_el;
-            curr_el = curr_el->next_pointer;
-            delete temp;
-        }
-    }
+
+    ~LinkedList();
 
     void add(var_type var);
     /*
@@ -62,18 +56,7 @@ public:
     // Overloaded operators to check if the list is empty by comparing `first_el` to `nullptr`.
 
 
-    void print(std::ostream& out = std::cout) const{
-        ListEl<var_type>* curr_el = first_el;
-        while (curr_el != nullptr){
-            out << curr_el -> var << ' ';
-            curr_el = curr_el ->next_pointer;
-        }
-    }
-
-    friend std::ostream& operator <<(std::ostream& out,const LinkedList& lst){
-        lst.print(out);
-        return out;
-    }
+    void print(std::ostream& out = std::cout) const;
 
     class ConstIterator {
     private:
@@ -113,7 +96,7 @@ public:
     }
 
 
-private:
+protected:
     void find_element_with_var(var_type var, ListEl<var_type>*& previous_element, ListEl<var_type>*& element_to_delete) const;
     /*
      * Finds the element with the given value and its preceding element.
@@ -124,10 +107,25 @@ private:
      * @param element_to_delete
      * no returning but changing previous_element and element_to_delete
      */
+    friend std::ostream& operator <<(std::ostream& out,const LinkedList& lst){
+        lst.print(out);
+        return out;
+    }
 
     template <typename T>
     friend class HashSet;
-};
+}; // End of the class
+
+// methods implementation
+template<typename var_type>
+LinkedList<var_type>::~LinkedList(){
+    ListEl<var_type>* curr_el = first_el;
+    while (curr_el != nullptr){
+        ListEl<var_type>* temp = curr_el;
+        curr_el = curr_el->next_pointer;
+        delete temp;
+    }
+}
 
 
 template<typename var_type>
@@ -198,7 +196,16 @@ void LinkedList<var_type>::pop(var_type var){
     size--;
 }
 
+template<typename var_type>
+void LinkedList<var_type>::print(std::ostream& out) const{
+    ListEl<var_type>* curr_el = first_el;
+    while (curr_el != nullptr){
+        out << curr_el -> var << ' ';
+        curr_el = curr_el ->next_pointer;
+    }
+}
 
+//protected:
 template<typename var_type>
 void LinkedList<var_type>::find_element_with_var(var_type var, ListEl<var_type>*& previous_element, ListEl<var_type>*& element_to_delete) const {
     if (size == 0){
