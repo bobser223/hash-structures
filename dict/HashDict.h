@@ -7,148 +7,265 @@
 #ifndef LEARNING_HASHDICT_H
 #define LEARNING_HASHDICT_H
 
+/**
+ * @brief A templated HashDict class implementing a hash table using separate chaining.
+ *
+ * This class provides functionality to add, check, and remove key-value pairs.
+ * It automatically resizes when the occupancy exceeds 75% to maintain efficiency.
+ *
+ * @tparam key_t The type of keys stored in the HashDict.
+ * @tparam value_t The type of values associated with the keys.
+ */
+
 template<typename key_t,typename value_t>
 class HashDict {
 protected:
-    int real_size;
-    int element_count;
-    int curr_pow_for_primes;
+    int real_size;                                /**< The current size of the hash table. */
+    int element_count;                            /**< The number of key-value pairs currently in the hash dictionary. */
+    int curr_pow_for_primes;                      /**< The current power used to determine the next prime size. */
 
-    LinkedList_dict<key_t, value_t>* element_arr;
+    LinkedList_dict<key_t, value_t>* element_arr; /**< Array of linked lists for separate chaining. */
 public:
+    /**
+     * @brief Default constructor.
+     *
+     * Initializes the hash dictionary with a default size and sets up the linked lists.
+     */
     HashDict();
 
+    /**
+     * @brief Destructor.
+     *
+     * Cleans up the allocated memory for the hash table.
+     */
     ~HashDict(){
         delete[] element_arr;
     }
-    // standard dict methods
+
+    /**
+     * @brief Adds a key-value pair to the HashDict.
+     *
+     * If the occupancy exceeds 75%, the hash table is resized to maintain performance.
+     *
+     * @param key The key to be added.
+     * @param value The value associated with the key.
+     */
     void add(key_t key, value_t value);
-    /*
-     * Adds a key-value pair to the dictionary.
-     * Resizes the array if occupancy exceeds 75%.
-    */
 
-
+    /**
+     * @brief Removes a key-value pair from the HashDict.
+     *
+     * Finds the key's hash, locates the appropriate bucket, and removes the key-value pair.
+     *
+     * @param key The key to be removed.
+     * @throws std::logic_error If the key is not found.
+     */
     void pop(key_t key);
-    /*
-     *  finds key's hash
-     *  finds place in the element_arr by hash
-     *  using LinkedList_dict method pop
-     *  |look to the LinkedList_dict for understanding structure|
-     */
 
+    /**
+     * @brief Checks if a key exists in the HashDict.
+     *
+     * Finds the key's hash, locates the appropriate bucket, and checks for the key's existence.
+     *
+     * @param key The key to check for.
+     * @return true If the key is present.
+     * @return false Otherwise.
+     */
     bool is_in(key_t key);
-    /*
-     *  finds key's hash
-     *  finds place in the element_arr by hash
-     *  using LinkedList_dict method is_in
-     *  |look to the LinkedList_dict for understanding structure|
-     */
 
+    /**
+     * @brief Retrieves the number of key-value pairs in the HashDict.
+     *
+     * @return int The count of elements.
+     */
     [[nodiscard]] int getSize() const {
         return element_count;
     }
-    /*
-     * @return count of elements
-     */
 
+    /**
+     * @brief Retrieves the current size of the hash table.
+     *
+     * @return int The size of the hash table.
+     */
     [[nodiscard]] int getTrueSize() const {
         return real_size;
     }
-    /*
-     * @return buffer size
-     */
+
 
     // operators
+
+
+    /**
+     * @brief Overloads the subscript operator to access values by key.
+     *
+     * Finds the value associated with the given key. Throws an error if the key does not exist.
+     * Allows modifying the value associated with the key.
+     *
+     * Example:
+     * @code
+     * HashDict<int, std::string> dict;
+     * dict.add(1, "one");
+     * dict[1] = "uno";
+     * @endcode
+     *
+     * @param key The key whose associated value is to be accessed.
+     * @return value_t& Reference to the value associated with the key.
+     * @throws std::logic_error If the key is not found.
+     */
     value_t& operator[](key_t key);
-    /*
-     * finds value by key
-     * throws error if key isn't in the dict
-     * for changing value
-     * dict[key] = value2;
-     */
 
+
+    /**
+     * @brief Overloads the subscript operator to access values by key (const version).
+     *
+     * Finds the value associated with the given key. Throws an error if the key does not exist.
+     * Allows copying the value associated with the key.
+     *
+     * Example:
+     * @code
+     * HashDict<int, std::string> dict;
+     * dict.add(1, "one");
+     * std::string value = dict[1];
+     * @endcode
+     *
+     * @param key The key whose associated value is to be accessed.
+     * @return const value_t& Const reference to the value associated with the key.
+     * @throws std::logic_error If the key is not found.
+     */
     const value_t& operator[](key_t key) const;
-    /*
-     * finds value by key
-     * throws error if key isn't in the dict
-     * for copying value
-     * value_t value_var = dict[key]
-     */
 
+    /**
+     * @brief Prints the contents of the HashDict.
+     *
+     * Iterates through each linked list and prints its key-value pairs.
+     *
+     * @param out The output stream to print to. Defaults to std::cout.
+     */
     void print(std::ostream& out = std::cout) const;
 
-protected:
-    void add_to_array(LinkedList_dict<key_t, value_t>* arr,int arr_size, key_t key, value_t value);
-    /*
-     * realisation add method for new element_arr
-     * @param arr | new element_arr
-     * @param arr_size | size of new element_arr
-     * @param key | key to add
-     * @param value | value to add
-     * @return void but in fact changing arr
-     */
 
+protected:
+
+    /**
+     * @brief Adds a key-value pair to a specified array.
+     *
+     * Used internally when resizing the hash table to add elements to the new array.
+     *
+     * @param arr Pointer to the new array of linked lists.
+     * @param arr_size The size of the new array.
+     * @param key The key to add.
+     * @param value The value associated with the key.
+     */
+    void add_to_array(LinkedList_dict<key_t, value_t>* arr,int arr_size, key_t key, value_t value);
+
+    /**
+     * @brief Computes the hash for integral types.
+     *
+     * Uses bitwise operations to generate a hash value for integers.
+     *
+     * @tparam T Integral type.
+     * @param value The value to hash.
+     * @param size The size of the hash table.
+     * @return long long int The computed hash modulo the table size.
+     */
     template <typename T>
     typename std::enable_if<std::is_integral<T>::value, long long int>::type
     getHash(T value, int size) const;
-    //hash for integers
 
+    /**
+     * @brief Computes the hash for floating-point types.
+     *
+     * Processes the binary representation of floating-point numbers to generate a hash.
+     *
+     * @tparam T Floating-point type.
+     * @param value The value to hash.
+     * @param size The size of the hash table.
+     * @return long long int The computed hash modulo the table size.
+     */
     template <typename T>
     typename std::enable_if<std::is_floating_point<T>::value, long long int>::type
     getHash(T value, int size) const;
-    //hash for floats
 
+    /**
+     * @brief Computes the hash for pointer types.
+     *
+     * Hashes the memory address of the pointer.
+     *
+     * @tparam T Pointer type.
+     * @param value The pointer to hash.
+     * @param size The size of the hash table.
+     * @return long long int The computed hash modulo the table size.
+     */
     template <typename T>
     typename std::enable_if<std::is_pointer<T>::value, long long int>::type
     getHash(T value, int size) const;
-    //hash for dynamic structures (pointers)
 
+    /**
+     * @brief Computes the hash for std::string.
+     *
+     * Processes each character in the string to generate a hash.
+     *
+     * @param value The string to hash.
+     * @param size The size of the hash table.
+     * @return long long int The computed hash modulo the table size.
+     */
     [[nodiscard]] long long int getHash(const std::string& value, int size) const;
-    //hash for std::string
 
-
-
+    /**
+     * @brief Calculates the current occupancy of the hash table.
+     *
+     * Determines the percentage of filled elements relative to the total size.
+     *
+     * @return float The occupancy percentage.
+     */
     float get_occupancy();
-    /*
-     * finds the percentage ratio of filled elements to the full size of the buffer
-     * @return buffer occupancy
+
+    /**
+     * @brief Resizes the hash table by creating a new array with a larger prime size.
+     *
+     * Allocates a new array, rehashes existing elements, and replaces the old array.
      */
-
-
     void create_new_elements_arr();
-    /*
-     * crates new element_arr with larger size
-     * copies pairs(key, value) from old array (direct) to new
-     * changes ald array (direct) to new one
-     * deletes old
-     */
 
+    /**
+     * @brief Copies all elements from the old hash table to the new one.
+     *
+     * Rehashes each key-value pair and inserts it into the appropriate linked list in the new array.
+     *
+     * @param new_arr Pointer to the new array of linked lists.
+     * @param new_size The size of the new array.
+     */
     void copy_list(LinkedList_dict<key_t, value_t>* new_arr, int new_size);
-    /*
-     * copies all element from old element_arr (direct) to the new element_arr
-     * @param new_arr | new element_arr
-     * @param new_size | size of new element_arr
+
+
+    /**
+     * @brief Finds the next prime number for resizing the hash table.
+     *
+     * Searches for prime numbers within the range [2^k, 2^(k+1)-1]. If no prime is found,
+     * it increments k and searches the next range recursively.
+     *
+     * @return long long The next prime number to be used as the new size.
      */
-
-
     long long next_prime();
-    /*
-     * the best sizes of Hash structure are primes between 2^k and 2^(k+1)-1
-     * this function finds them,
-     * so it starts from the middle of [2^k, 2^(k+1)-1]
-     * and goes simultaneously to the right and left of segment
-     *  checking each number;
-     *  if there's no prime number in this segment k = k+1 and does the same
-     *  if there is prime k = k+1 and returning it;
-     *  @return prime number for element_arr size
-     */
 
+    /**
+     * @brief Checks if a number is prime.
+     *
+     * Uses trial division to determine if a number is prime.
+     *
+     * @param num The number to check.
+     * @return true If the number is prime.
+     * @return false Otherwise.
+     */
     static bool is_prime(long long num);
-    /*
-     * standard prime check
-     */
 
+    /**
+     * @brief Overloads the insertion operator to print the HashDict.
+     *
+     * @param out The output stream.
+     * @param dict The HashDict to print.
+     * @return std::ostream& The output stream.
+     */
     friend std::ostream& operator <<(std::ostream& out,const HashDict& dict){
         dict.print(out);
         return out;
@@ -288,7 +405,7 @@ long long int HashDict<key_t, value_t>::getHash(const std::string& value, int si
 }
 
 
-// puffer scaling functions
+// buffer scaling functions
 template<typename key_t,typename value_t>
 void HashDict<key_t, value_t>::add_to_array(LinkedList_dict<key_t, value_t>* arr,int arr_size, key_t key, value_t value){
     int position = HashDict<key_t, value_t>::getHash(key, arr_size);

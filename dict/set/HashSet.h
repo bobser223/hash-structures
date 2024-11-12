@@ -9,111 +9,200 @@
 #ifndef LEARNING_HASHSET_H
 #define LEARNING_HASHSET_H
 
+
+/**
+ * @brief A templated HashSet class implementing a hash set using separate chaining.
+ *
+ * This class provides functionality to add, check, and remove elements from the set.
+ * It automatically resizes when the occupancy exceeds 75% to maintain efficiency.
+ *
+ * @tparam var_type The type of elements stored in the HashSet.
+ */
 template<typename var_type>
 class HashSet {
 protected:
-    int real_size;
-    int element_count;
-    int curr_pow_for_primes;
+    int real_size;                 /**< The current size of the hash table. */
+    int element_count;             /**< The number of elements currently in the hash set. */
+    int curr_pow_for_primes;       /**< The current power used to determine the next prime size. */
 
-    LinkedList<var_type>* element_arr;
+    LinkedList<var_type>* element_arr; /**< Array of linked lists for separate chaining. */
 
 public:
+
+    /**
+     * @brief Default constructor.
+     *
+     * Initializes the hash set with a default size and sets up the linked lists.
+     */
     HashSet();
 
+    /**
+     * @brief Destructor.
+     *
+     * Cleans up the allocated memory for the hash table.
+     */
     ~HashSet(){
         delete[] element_arr;
     }
 
 
+    /**
+     * @brief Adds an element to the HashSet.
+     *
+     * If the occupancy exceeds 75%, the hash table is resized to maintain performance.
+     *
+     * @param var The element to be added.
+     */
     void add(var_type var);
-    /*
-     * Adds a key to the dictionary.
-     * Resizes the array if occupancy exceeds 75%.
-    */
+
+    /**
+     * @brief Checks if an element exists in the HashSet.
+     *
+     * @param var The element to check for.
+     * @return true If the element is present.
+     * @return false Otherwise.
+     */
     bool is_in(var_type var);
 
-    void pop(var_type var);
-    /*
-     *  deletes hash
+    /**
+     * @brief Removes an element from the HashSet.
      *
-     *  finds var's hash
-     *  finds place in the element_arr by hash
-     *  using LinkedList_dict method pop
-     *  |look to the LinkedList_dict for understanding structure|
+     * Deletes the element by finding its hash and removing it from the corresponding linked list.
+     *
+     * @param var The element to be removed.
+     * @throws std::logic_error If the element is not found.
+     */
+    void pop(var_type var);
+
+    /**
+     * @brief Retrieves the number of elements in the HashSet.
+     *
+     * @return int The count of elements.
      */
     int getSize(){
         return element_count;
     }
-    /*
-     * @return count of elements
-     */
 
+    /**
+     * @brief Prints the contents of the HashSet.
+     *
+     * Iterates through all linked lists and prints their elements.
+     *
+     * @param out The output stream to print to. Defaults to std::cout.
+     */
     void print(std::ostream& out = std::cout) const;
+
 
 protected:
 
+    /**
+     * @brief Computes the hash for integral types.
+     *
+     * Uses bitwise operations to generate a hash value for integers.
+     *
+     * @tparam T Integral type.
+     * @param value The value to hash.
+     * @return long long int The computed hash.
+     */
     template <typename T>
     typename std::enable_if<std::is_integral<T>::value, long long int>::type
     getHash(T value);
-    // hash for integers
 
+    /**
+     * @brief Computes the hash for floating-point types.
+     *
+     * Processes the binary representation of floating-point numbers to generate a hash.
+     *
+     * @tparam T Floating-point type.
+     * @param value The value to hash.
+     * @return long long int The computed hash.
+     */
     template <typename T>
     typename std::enable_if<std::is_floating_point<T>::value, long long int>::type
     getHash(T value);
-    // hash for floats
 
 
+    /**
+     * @brief Computes the hash for pointer types.
+     *
+     * Hashes the memory address of the pointer.
+     *
+     * @tparam T Pointer type.
+     * @param value The pointer to hash.
+     * @return long long int The computed hash.
+     */
     template <typename T>
     typename std::enable_if<std::is_pointer<T>::value, long long int>::type
     getHash(T value);
-    //hash for dynamic structures (pointers)
 
+    /**
+     * @brief Computes the hash for std::string.
+     *
+     * Processes each character in the string to generate a hash.
+     *
+     * @param value The string to hash.
+     * @return long long int The computed hash.
+     */
     long long int getHash(const std::string& value) const;
-    //hash for strings
 
+    /**
+     * @brief Calculates the current occupancy of the hash table.
+     *
+     * Determines the percentage of filled elements relative to the total size.
+     *
+     * @return float The occupancy percentage.
+     */
     float get_occupancy(){
         if (HashSet<var_type>::real_size == 0) return 0;
         return ((float)HashSet<var_type>::element_count / HashSet<var_type>::real_size) * 100;
     }
-    /*
-     * finds the percentage ratio of filled elements to the full size of the buffer
-     * @return buffer occupancy
-     */
 
+    /**
+     * @brief Resizes the hash table by creating a new array with a larger prime size.
+     *
+     * Allocates a new array, rehashes existing elements, and replaces the old array.
+     */
     void create_new_elements_arr();
-    /*
-     * crates new element_arr with larger size
-     * copies pairs(key, value) from old array (direct) to new
-     * changes ald array (direct) to new one
-     * deletes old
-     */
 
+    /**
+     * @brief Copies all elements from the old hash table to the new one.
+     *
+     * Rehashes each element and inserts it into the appropriate linked list in the new array.
+     *
+     * @param new_lst Pointer to the new array of linked lists.
+     * @param new_size The size of the new array.
+     */
     void copy_list(LinkedList<var_type>* new_lst, int new_size);
-    /*
-     * copies all element from old element_arr (direct) to the new element_arr
-     * @param new_arr | new element_arr
-     * @param new_size | size of new element_arr
+
+
+    /**
+     * @brief Finds the next prime number for resizing the hash table.
+     *
+     * Searches for prime numbers within the range [2^k, 2^(k+1)-1]. If no prime is found,
+     * it increments k and searches the next range.
+     *
+     * @return long long The next prime number to be used as the new size.
      */
-
-
     long long next_prime();
-    /*
-     * the best sizes of Hash structure are primes between 2^k and 2^(k+1)-1
-     * this function finds them,
-     * so it starts from the middle of [2^k, 2^(k+1)-1]
-     * and goes simultaneously to the right and left of segment
-     *  checking each number;
-     *  if there's no prime number in this segment k = k+1 and does the same
-     *  if there is prime k = k+1 and returning it;
-     *  @return prime number for element_arr size
-     */
 
+    /**
+     * @brief Checks if a number is prime.
+     *
+     * Uses trial division to determine if a number is prime.
+     *
+     * @param num The number to check.
+     * @return true If the number is prime.
+     * @return false Otherwise.
+     */
     static bool is_prime(long long num);
-    /*
-     * standard prime check
-     */
 
+    /**
+     * @brief Overloads the insertion operator to print the HashSet.
+     *
+     * @param out The output stream.
+     * @param set The HashSet to print.
+     * @return std::ostream& The output stream.
+     */
     friend std::ostream& operator <<(std::ostream& out,const HashSet& set){
         set.print(out);
         return out;

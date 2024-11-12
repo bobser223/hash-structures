@@ -8,59 +8,130 @@
 #ifndef LEARNING_LINKEDLIST_H
 #define LEARNING_LINKEDLIST_H
 
+
+/**
+ * @brief A templated structure representing a node in the linked list.
+ *
+ * @tparam var_type The type of the value stored in the node.
+ */
 template<typename var_type>
 struct ListEl{
-    bool is_empty;
-    var_type var;
-    ListEl<var_type>* next_pointer;
+    bool is_empty;                     /**< Flag indicating if the node is empty (actually useless). */
+    var_type var;                      /**< The value stored in the node. */
+    ListEl<var_type>* next_pointer;    /**< Pointer to the next node in the list. */
 };
+
+/**
+ * @brief A templated singly linked list class.
+ *
+ * Provides functionality to add, check, and remove elements. Supports iteration
+ * through the list using a const iterator.
+ *
+ * @tparam var_type The type of elements stored in the linked list.
+ */
 
 template<typename var_type>
 class LinkedList {
 
 private:
-    int size;
-    ListEl<var_type>* first_el;
+    int size;                       /**< The number of elements in the list. */
+    ListEl<var_type>* first_el;     /**< Pointer to the first element in the list. */
+
 
 public:
 
+    /**
+     * @brief Default constructor.
+     *
+     * Initializes an empty linked list.
+     */
     LinkedList() : first_el(nullptr), size(0) {}
 
+    /**
+     * @brief Destructor.
+     *
+     * Cleans up all nodes in the linked list.
+     */
     ~LinkedList();
 
+    /**
+     * @brief Adds an element to the linked list.
+     *
+     * Adds a new element to the end of the list if it doesn't already exist.
+     *
+     * @param var The element to add.
+     */
     void add(var_type var);
-    /*
-     * adds a new element to the end of the list if it doesn't already exist.
-     * @param value to check
-     */
 
+    /**
+     * @brief Checks if an element exists in the linked list.
+     *
+     * @param var The element to check for.
+     * @return true If the element is present.
+     * @return false Otherwise.
+     */
     bool is_in(var_type var);
-    // Checks if the value exists in the list.
 
-    void pop(var_type var);
-    /*
-     * deletes ListEl with given key
-     * Throws an exception if the element is not found.
-     * @param value to delete
+    /**
+     * @brief Removes an element from the linked list.
+     *
+     * Deletes the node containing the specified element.
+     *
+     * @param var The element to remove.
+     * @throws std::logic_error If the element is not found.
      */
+    void pop(var_type var);
 
+    /**
+     * @brief Overloads the equality operator.
+     *
+     * Compares the first element of the list with a given value.
+     *
+     * @tparam name The type of the value to compare.
+     * @param var The value to compare with the first element.
+     * @return true If the first element is equal to the value.
+     * @return false Otherwise.
+     */
     template<class name>
     bool operator==(name var){
         return first_el == var;
     }
 
+    /**
+     * @brief Overloads the inequality operator.
+     *
+     * Compares the first element of the list with a given value.
+     *
+     * @tparam name The type of the value to compare.
+     * @param var The value to compare with the first element.
+     * @return true If the first element is not equal to the value.
+     * @return false Otherwise.
+     */
     template<class name>
     bool operator!=(name var){
         return first_el != var;
     }
-    // Overloaded operators to check if the list is empty by comparing `first_el` to `nullptr`.
 
 
+    /**
+     * @brief Prints the contents of the linked list.
+     *
+     * Iterates through all nodes and prints their values.
+     *
+     * @param out The output stream to print to. Defaults to std::cout.
+     */
     void print(std::ostream& out = std::cout) const;
 
+
+
+    /**
+     * @brief A constant iterator for the LinkedList.
+     *
+     * Allows iteration over the linked list without modifying its elements.
+     */
     class ConstIterator {
     private:
-        const ListEl<var_type>* current;
+        const ListEl<var_type>* current; /**< Pointer to the current node in the iteration. */
 
     public:
         using iterator_category = std::forward_iterator_tag;
@@ -69,16 +140,38 @@ public:
         using pointer = const var_type*;
         using reference = const var_type&;
 
+        /**
+         * @brief Constructs a ConstIterator.
+         *
+         * @param ptr Pointer to the starting node.
+         */
         ConstIterator(const ListEl<var_type>* ptr) : current(ptr) {}
 
+        /**
+         * @brief Checks if two iterators are not equal.
+         *
+         * @param other The other iterator to compare with.
+         * @return true If the iterators point to different nodes.
+         * @return false Otherwise.
+         */
         bool operator!=(const ConstIterator& other) const {
             return current != other.current;
         }
 
+        /**
+         * @brief Dereferences the iterator to access the current element.
+         *
+         * @return const var_type& Reference to the current element.
+         */
         const var_type& operator*() const {
             return current->var;
         }
 
+        /**
+         * @brief Advances the iterator to the next element.
+         *
+         * @return ConstIterator& Reference to the updated iterator.
+         */
         ConstIterator& operator++() {
             if(current != nullptr){
                 current = current->next_pointer;
@@ -87,9 +180,20 @@ public:
         }
     };
 
+    /**
+     * @brief Returns an iterator to the beginning of the list.
+     *
+     * @return ConstIterator An iterator pointing to the first element.
+     */
     ConstIterator begin() const {
         return ConstIterator(first_el);
     }
+
+    /**
+     * @brief Returns an iterator to the end of the list.
+     *
+     * @return ConstIterator An iterator pointing past the last element.
+     */
 
     ConstIterator end() const {
         return ConstIterator(nullptr);
@@ -97,20 +201,31 @@ public:
 
 
 protected:
+    /**
+     * @brief Finds the element with the given value and its preceding element.
+     *
+     * Searches the list for the specified value and sets pointers to the previous
+     * and target elements.
+     *
+     * @param var The value to search for.
+     * @param previous_element Reference to a pointer that will point to the preceding element.
+     * @param element_to_delete Reference to a pointer that will point to the target element.
+     * @throws std::logic_error If the element is not found.
+     */
     void find_element_with_var(var_type var, ListEl<var_type>*& previous_element, ListEl<var_type>*& element_to_delete) const;
-    /*
-     * Finds the element with the given value and its preceding element.
-     * Throws an exception if the element is not found.
-     * I've used it for finding elements to delete.
-     * @param variable
-     * @param previous_element
-     * @param element_to_delete
-     * no returning but changing previous_element and element_to_delete
+
+    /**
+     * @brief Overloads the insertion operator to print the LinkedList.
+     *
+     * @param out The output stream.
+     * @param lst The LinkedList to print.
+     * @return std::ostream& The output stream.
      */
     friend std::ostream& operator <<(std::ostream& out,const LinkedList& lst){
         lst.print(out);
         return out;
     }
+
 
     template <typename T>
     friend class HashSet;

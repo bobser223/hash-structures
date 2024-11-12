@@ -8,126 +8,220 @@
 #define LEARNING_LINKEDLIST_DICT_H
 
 
-
+/**
+ * @brief A structure representing a node in the linked list for HashDict.
+ *
+ * @tparam key_type The type of the key stored in the node.
+ * @tparam value_type The type of the value stored in the node.
+ */
 template<typename key_type, typename value_type>
 struct ListEl{
-    bool is_empty;
-    key_type key;
-    value_type value;
-    ListEl<key_type, value_type>* next_pointer;
+    bool is_empty;                                 /**< Flag indicating if the node is empty (actually useless). */
+    key_type key;                                  /**< The key stored in the node. */
+    value_type value;                              /**< The value associated with the key. */
+    ListEl<key_type, value_type>* next_pointer;    /**< Pointer to the next node in the list. */
 };
 
 
+/**
+ * @brief A structure representing a key-value pair.
+ *
+ * @tparam key_type The type of the key.
+ * @tparam value_type The type of the value.
+ */
 template<typename key_type, typename value_type>
 struct Couple{
-    key_type key;
-    value_type value;
+    key_type key;          /**< The key of the pair. */
+    value_type value;      /**< The value of the pair. */
 };
 
 
-
-
+/**
+ * @brief A templated singly linked list class for HashDict.
+ *
+ * Provides functionality to add, check, and remove key-value pairs.
+ * Supports access to values by key and iteration through the list.
+ *
+ * @tparam key_type The type of keys stored in the linked list.
+ * @tparam value_type The type of values associated with the keys.
+ */
 template<typename key_type, typename value_type>
 class LinkedList_dict {
 private:
-    int size;
-    ListEl<key_type, value_type>* first_el;
+
+    int size;                                /**< The number of key-value pairs in the list. */
+    ListEl<key_type, value_type>* first_el;  /**< Pointer to the first element in the list. */
+
 public:
+    /**
+     * @brief Default constructor.
+     *
+     * Initializes an empty linked list.
+     */
     LinkedList_dict() : size(0), first_el(nullptr) {}
 
+    /**
+     * @brief Destructor.
+     *
+     * Cleans up all nodes in the linked list.
+     */
     ~LinkedList_dict();
 
-    void add(key_type key, value_type value);
-    /*
-     * pushes back ListEl with key and value
+     /**
+     * @brief Adds a key-value pair to the linked list.
      *
-     * checks is there element with same key as input key
-     * if there is does nothing
-     * if not makes new ListEl with input key and value then
-     * goes to the last element and changes last element
-     * next pointer to new ListEl, now new ListEl is the last element
-     * P.S if there is 0 elements first_el = new ListEl
-     * @param key to add
-     * @param value to add
+     * Adds a new key-value pair to the end of the list if the key does not already exist.
+     *
+     * @param key The key to add.
+     * @param value The value associated with the key.
      */
+    void add(key_type key, value_type value);
 
-
+    /**
+     * @brief Checks if a key exists in the linked list.
+     *
+     * @param key The key to check for.
+     * @return true If the key is present.
+     * @return false Otherwise.
+     */
     bool is_in(key_type key);
-    /*
-     * checks is key int the LinkedList_dict
-     * @param value to check
-     */
 
+    /**
+     * @brief Removes a key-value pair from the linked list.
+     *
+     * Deletes the node containing the specified key.
+     *
+     * @param key The key to remove.
+     * @throws std::logic_error If the key is not found.
+     */
     void pop(key_type key);
-    /*
-     * deletes ListEl with given key
-     * @param value to delete
-     */
 
+    /**
+     * @brief Retrieves the number of key-value pairs in the linked list.
+     *
+     * @return int The count of elements.
+     */
     int get_size(){
         return size;
     }
 
     // operators
 
+    /**
+     * @brief Overloads the equality operator.
+     *
+     * Compares the first element of the list with a given value.
+     *
+     * @tparam name The type of the value to compare.
+     * @param var The value to compare with the first element.
+     * @return true If the first element is equal to the value.
+     * @return false Otherwise.
+     */
     template<class name>
     bool operator==(name var){
         return first_el == var;
     }
 
+    /**
+     * @brief Overloads the inequality operator.
+     *
+     * Compares the first element of the list with a given value.
+     *
+     * @tparam name The type of the value to compare.
+     * @param var The value to compare with the first element.
+     * @return true If the first element is not equal to the value.
+     * @return false Otherwise.
+     */
     template<class name>
     bool operator!=(name var){
         return first_el != var;
     }
 
-    /*
-     * operator != and == are needed for checking is LinkedList_dict empty
-     * I used it to check first_el is it nullptr or not;
-     */
-
+    /**
+      * @brief Overloads the subscript operator to access values by key (const version).
+      *
+      * Finds the value associated with the given key. Throws an error if the key does not exist.
+      * Allows copying the value associated with the key.
+      *
+      * Example:
+      * @code
+      * LinkedList_dict<int, std::string> list;
+      * list.add(1, "one");
+      * std::string value = list[1];
+      * @endcode
+      *
+      * @param key The key whose associated value is to be accessed.
+      * @return const value_type& Const reference to the value associated with the key.
+      * @throws std::logic_error If the key is not found.
+      */
     const value_type& operator[](key_type key) const;
-    /*
-     * finds value by key
-     * for copying value
-     * value_type value_var = list[key]
+
+    /**
+     * @brief Overloads the subscript operator to access values by key.
+     *
+     * Finds the value associated with the given key. Throws an error if the key does not exist.
+     * Allows modifying the value associated with the key.
+     *
+     * Example:
+     * @code
+     * LinkedList_dict<int, std::string> list;
+     * list.add(1, "one");
+     * list[1] = "uno";
+     * @endcode
+     *
+     * @param key The key whose associated value is to be accessed.
+     * @return value_type& Reference to the value associated with the key.
+     * @throws std::logic_error If the key is not found.
      */
-
     value_type& operator[](key_type key);
-    /*
-    * finds value by key
-    * for changing value
-    * list[key] = value2;
-    */
 
+    /**
+     * @brief Prints the contents of the linked list.
+     *
+     * Iterates through all nodes and prints their key-value pairs.
+     *
+     * @param out The output stream to print to. Defaults to std::cout.
+     */
     void print(std::ostream& out = std::cout) const;
 
-
+    /**
+     * @brief Overloads the insertion operator to print the LinkedList_dict.
+     *
+     * @param out The output stream.
+     * @param lst The LinkedList_dict to print.
+     * @return std::ostream& The output stream.
+     */
     friend std::ostream& operator <<(std::ostream& out,const LinkedList_dict& lst){
         lst.print(out);
         return out;
     }
-    /*
-     * overloading cout operator <<
-     */
+
 
 protected:
+    /**
+     * @brief Retrieves a key-value pair by index.
+     *
+     * Finds the key-value pair at the specified index and returns it as a Couple structure.
+     *
+     * @param index The index of the desired key-value pair.
+     * @return Couple<key_type, value_type> The key-value pair at the specified index.
+     * @throws std::logic_error If the index is out of bounds.
+     */
     Couple<key_type,value_type> get_couple(int index);
-    /*
-     * finds element by index and returns struct with key and value
-     * this function needed for copying this list to another
-     * @param index
-     * @return struct couple(key, value)
-     */
 
-    void find_element_with_key(key_type key, ListEl<key_type, value_type>*& previous_element, ListEl<key_type, value_type>*& element_to_delete) const;
-    /*
-     * finds element with present key and previous element to it.
-     * I've used it for finding elements to delete.
-     * @param key
-     * @param previous_element
-     * @param element_to_delete
-     * no returning but changing previous_element and element_to_delete
+    /**
+     * @brief Finds the node with the specified key and its preceding node.
+     *
+     * Searches the list for the specified key and sets pointers to the previous
+     * and target nodes.
+     *
+     * @param key The key to search for.
+     * @param previous_element Reference to a pointer that will point to the preceding node.
+     * @param element_to_delete Reference to a pointer that will point to the target node.
+     * @throws std::logic_error If the key is not found.
      */
+    void find_element_with_key(key_type key, ListEl<key_type, value_type>*& previous_element, ListEl<key_type, value_type>*& element_to_delete) const;
+
 
     template <typename T>
     friend class HashSet;
@@ -138,6 +232,7 @@ protected:
 
 
 // public
+
 template<typename key_type, typename value_type>
 LinkedList_dict<key_type, value_type>::~LinkedList_dict(){
     ListEl<key_type, value_type>* curr_el= first_el;
@@ -148,7 +243,6 @@ LinkedList_dict<key_type, value_type>::~LinkedList_dict(){
         curr_el = next;
     }
 }
-
 
 template<typename key_type, typename value_type>
 void LinkedList_dict<key_type, value_type>::add(key_type key, value_type value){
