@@ -35,52 +35,21 @@ public:
     }
 
     void add(var_type var);
+    /*
+     * adds a new element to the end of the list if it doesn't already exist.
+     * @param value to check
+     */
 
-    bool is_in(var_type var){
-        if (size == 0){
-//            throw std::logic_error("no elements here!!!");
-            return false;
-        } else {
+    bool is_in(var_type var);
+    // Checks if the value exists in the list.
 
-            ListEl<var_type>* curr_el = first_el;
-            while (curr_el != nullptr){
-                if (curr_el->var == var && !curr_el->is_empty) return true;
-                curr_el = curr_el->next_pointer;
-            }
-            return false;
+    void pop(var_type var);
+    /*
+     * deletes ListEl with given key
+     * Throws an exception if the element is not found.
+     * @param value to delete
+     */
 
-
-
-        }
-    }
-
-    void pop(var_type var){
-        if (!is_in(var)){
-            throw std::logic_error("this variable isn't here!!!");
-        }
-
-        if (size == 1){
-            delete first_el;
-            first_el = nullptr;
-        } else if (first_el->var == var){
-            ListEl<var_type>* temp = first_el;
-            first_el = first_el->next_pointer;
-            delete temp;
-        } else {
-            ListEl<var_type>* previous_element = nullptr;
-            ListEl<var_type>* element_to_delete = nullptr;
-            find_element_with_var(var, previous_element, element_to_delete);
-
-            if (element_to_delete != nullptr && previous_element != nullptr){
-                previous_element->next_pointer = element_to_delete->next_pointer;
-                delete element_to_delete;
-            }
-        }
-
-        size--;
-    }
-
-    //just for checking is there first element;
     template<class name>
     bool operator==(name var){
         return first_el == var;
@@ -90,6 +59,8 @@ public:
     bool operator!=(name var){
         return first_el != var;
     }
+    // Overloaded operators to check if the list is empty by comparing `first_el` to `nullptr`.
+
 
     void print(std::ostream& out = std::cout) const{
         ListEl<var_type>* curr_el = first_el;
@@ -143,28 +114,17 @@ public:
 
 
 private:
-    void find_element_with_var(var_type var, ListEl<var_type>*& previous_element, ListEl<var_type>*& element_to_delete) const {
-        if (size == 0){
-            throw std::logic_error("no elements here!!!");
-        }
+    void find_element_with_var(var_type var, ListEl<var_type>*& previous_element, ListEl<var_type>*& element_to_delete) const;
+    /*
+     * Finds the element with the given value and its preceding element.
+     * Throws an exception if the element is not found.
+     * I've used it for finding elements to delete.
+     * @param variable
+     * @param previous_element
+     * @param element_to_delete
+     * no returning but changing previous_element and element_to_delete
+     */
 
-        previous_element = nullptr;
-        element_to_delete = nullptr;
-        ListEl<var_type>* curr_el = first_el;
-
-        while (curr_el != nullptr){
-            if (curr_el->var == var && !curr_el->is_empty){
-                element_to_delete = curr_el;
-                break;
-            }
-            previous_element = curr_el;
-            curr_el = curr_el->next_pointer;
-        }
-
-        if (element_to_delete == nullptr){
-            throw std::logic_error("Element not found!");
-        }
-    }
     template <typename T>
     friend class HashSet;
 };
@@ -191,6 +151,77 @@ void LinkedList<var_type>::add(var_type var){
 
 }
 
+template<typename var_type>
+bool LinkedList<var_type>::is_in(var_type var){
+    if (size == 0){
+        return false;
+    } else {
+
+        ListEl<var_type>* curr_el = first_el;
+        // while current element exists
+        while (curr_el != nullptr){
+            if (curr_el->var == var && !curr_el->is_empty) return true;
+            curr_el = curr_el->next_pointer;
+        }
+        return false;
+
+
+
+    }
+}
+
+
+template<typename var_type>
+void LinkedList<var_type>::pop(var_type var){
+    if (!is_in(var)){
+        throw std::logic_error("this variable isn't here!!!");
+    }
+
+    if (size == 1){
+        delete first_el;
+        first_el = nullptr;
+    } else if (first_el->var == var){
+        ListEl<var_type>* temp = first_el;
+        first_el = first_el->next_pointer;
+        delete temp;
+    } else {
+        ListEl<var_type>* previous_element = nullptr;
+        ListEl<var_type>* element_to_delete = nullptr;
+        find_element_with_var(var, previous_element, element_to_delete);
+
+        if (element_to_delete != nullptr && previous_element != nullptr){
+            previous_element->next_pointer = element_to_delete->next_pointer;
+            delete element_to_delete;
+        }
+    }
+
+    size--;
+}
+
+
+template<typename var_type>
+void LinkedList<var_type>::find_element_with_var(var_type var, ListEl<var_type>*& previous_element, ListEl<var_type>*& element_to_delete) const {
+    if (size == 0){
+        throw std::logic_error("no elements here!!!");
+    }
+
+    previous_element = nullptr;
+    element_to_delete = nullptr;
+    ListEl<var_type>* curr_el = first_el;
+
+    while (curr_el != nullptr){
+        if (curr_el->var == var && !curr_el->is_empty){
+            element_to_delete = curr_el;
+            break;
+        }
+        previous_element = curr_el;
+        curr_el = curr_el->next_pointer;
+    }
+
+    if (element_to_delete == nullptr){
+        throw std::logic_error("Element not found!");
+    }
+}
 
 #endif //LEARNING_LINKEDLIST_H
 

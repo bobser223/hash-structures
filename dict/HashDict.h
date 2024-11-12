@@ -30,12 +30,10 @@ public:
     // standard dict methods
     void add(key_t key, value_t value);
     /*
-     * if there less than 25% of free buckets in elements arr creating new longer arr
-     * if not just continue
-     *  than finds key's hash
-     * adds key and value to element_arr by hash
-     *  |look to the LinkedList_dict for understanding structure|
-     */
+     * Adds a key-value pair to the dictionary.
+     * Resizes the array if occupancy exceeds 75%.
+    */
+
 
     void pop(key_t key);
     /*
@@ -71,6 +69,7 @@ public:
     value_t& operator[](key_t key);
     /*
      * finds value by key
+     * throws error if key isn't in the dict
      * for changing value
      * dict[key] = value2;
      */
@@ -78,13 +77,14 @@ public:
     const value_t& operator[](key_t key) const;
     /*
      * finds value by key
+     * throws error if key isn't in the dict
      * for copying value
      * value_t value_var = dict[key]
      */
 
     void print(std::ostream& out = std::cout) const {
         for (int i = 0; i < real_size; i++){
-            // if bucket is empty
+            // if element_arr[i] is empty, overloaded operator, look at LinkedList_dict.h
             if (element_arr[i] == nullptr) continue;
             out << element_arr[i] << " ";
         }
@@ -104,6 +104,10 @@ protected:
     template <typename T>
     typename std::enable_if<std::is_integral<T>::value, long long int>::type
     getHash(T value, int size) const {
+        // hash function works only for positive nums
+        if (value < 0) {
+            value = -value;
+        }
         long long int result = 0;
         while (value) {
             result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
@@ -147,20 +151,6 @@ protected:
             result ^= static_cast<unsigned char>(c);
         }
         return result % size;
-    }
-    // for random type;
-    template <typename T>
-    typename std::enable_if<!std::is_integral<T>::value &&
-                            !std::is_floating_point<T>::value &&
-                            !std::is_pointer<T>::value, long long int>::type
-    getHash(const T& value, int size) const {
-        long long int result = 0;
-        const unsigned char* bytePtr = reinterpret_cast<const unsigned char*>(&value);
-        for (size_t i = 0; i < sizeof(T); ++i) {
-            result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
-            result ^= bytePtr[i];
-        }
-        return (result % size);
     }
 
     float get_occupancy();
@@ -230,7 +220,7 @@ template<typename key_t,typename value_t>
 void HashDict<key_t, value_t>::pop(key_t key){
 
     int position = HashDict<key_t, value_t>::getHash(key, real_size);
-
+    // if element_arr[i] is not empty, overloaded operator, look to LinkedList.h
     if (HashDict<key_t, value_t>::element_arr[position] != nullptr){
         element_arr[position].pop(key);
         element_count --;
@@ -248,12 +238,14 @@ bool HashDict<key_t, value_t>::is_in(key_t key){
 
 template<typename key_t,typename value_t>
 value_t& HashDict<key_t, value_t>::operator[](key_t key) {
+    if(!is_in(key)) throw std::logic_error("no such key in the dict!!!");
     int position = HashDict<key_t, value_t>::getHash(key, real_size);
     return element_arr[position][key];
 }
 
 template<typename key_t,typename value_t>
 const value_t& HashDict<key_t, value_t>::operator[](key_t key) const{
+    if(!is_in(key)) throw std::logic_error("no such key in the dict!!!");
     int position = getHash(key, real_size);
     return element_arr[position][key];
 }

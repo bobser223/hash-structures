@@ -35,6 +35,16 @@ private:
 public:
     LinkedList_dict() : size(0), first_el(nullptr) {}
 
+    ~LinkedList_dict(){
+        ListEl<key_type, value_type>* curr_el= first_el;
+        while (curr_el != nullptr){
+
+            ListEl<key_type, value_type>* next = curr_el->next_pointer;
+            delete curr_el;
+            curr_el = next;
+        }
+    }
+
     void add(key_type key, value_type value);
     /*
      * pushes back ListEl with key and value
