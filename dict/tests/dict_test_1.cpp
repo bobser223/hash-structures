@@ -5,11 +5,9 @@
 class HashDictTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        // Setup code, якщо потрібно
     }
 
     void TearDown() override {
-        // Cleanup code, якщо потрібно
     }
 };
 

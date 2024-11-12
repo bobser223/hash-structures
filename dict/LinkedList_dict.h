@@ -35,15 +35,7 @@ private:
 public:
     LinkedList_dict() : size(0), first_el(nullptr) {}
 
-    ~LinkedList_dict(){
-        ListEl<key_type, value_type>* curr_el= first_el;
-        while (curr_el != nullptr){
-
-            ListEl<key_type, value_type>* next = curr_el->next_pointer;
-            delete curr_el;
-            curr_el = next;
-        }
-    }
+    ~LinkedList_dict();
 
     void add(key_type key, value_type value);
     /*
@@ -107,13 +99,8 @@ public:
     * list[key] = value2;
     */
 
-    void print(std::ostream& out = std::cout) const{
-        ListEl<key_type, value_type>* curr_el = first_el;
-        while (curr_el != nullptr){
-            out << curr_el -> key << ':' << curr_el -> value << ' ';
-            curr_el = curr_el ->next_pointer;
-        }
-    }
+    void print(std::ostream& out = std::cout) const;
+
 
     friend std::ostream& operator <<(std::ostream& out,const LinkedList_dict& lst){
         lst.print(out);
@@ -123,7 +110,7 @@ public:
      * overloading cout operator <<
      */
 
-private:
+protected:
     Couple<key_type,value_type> get_couple(int index);
     /*
      * finds element by index and returns struct with key and value
@@ -141,13 +128,28 @@ private:
      * @param element_to_delete
      * no returning but changing previous_element and element_to_delete
      */
+
     template <typename T>
     friend class HashSet;
 
     template<typename key_t, typename value_t>
     friend class HashDict;
-};
+}; // End of the class
+
+
 // public
+template<typename key_type, typename value_type>
+LinkedList_dict<key_type, value_type>::~LinkedList_dict(){
+    ListEl<key_type, value_type>* curr_el= first_el;
+    while (curr_el != nullptr){
+
+        ListEl<key_type, value_type>* next = curr_el->next_pointer;
+        delete curr_el;
+        curr_el = next;
+    }
+}
+
+
 template<typename key_type, typename value_type>
 void LinkedList_dict<key_type, value_type>::add(key_type key, value_type value){
 
@@ -245,8 +247,19 @@ value_type& LinkedList_dict<key_type, value_type>::operator[](key_type key){
     }
 }
 
+template<typename key_type, typename value_type>
+void LinkedList_dict<key_type, value_type>::print(std::ostream& out) const{
+    ListEl<key_type, value_type>* curr_el = first_el;
+    while (curr_el != nullptr){
+        out << curr_el -> key << ':' << curr_el -> value << ' ';
+        curr_el = curr_el ->next_pointer;
+    }
+}
 
-// private
+
+// protected
+
+
 template<typename key_type, typename value_type>
 Couple<key_type,value_type> LinkedList_dict<key_type, value_type>::get_couple(int index){
     if (index > size - 1) throw std::logic_error("too big index!!!");

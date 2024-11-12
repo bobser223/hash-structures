@@ -16,13 +16,7 @@ protected:
 
     LinkedList_dict<key_t, value_t>* element_arr;
 public:
-    HashDict(){
-        real_size = 5;
-        element_count = 0;
-        curr_pow_for_primes = 3;
-        element_arr = new LinkedList_dict<key_t, value_t>[real_size];
-        for (int i = 0; i < 5; i++) element_arr[i].first_el = nullptr;
-    }
+    HashDict();
 
     ~HashDict(){
         delete[] element_arr;
@@ -82,13 +76,7 @@ public:
      * value_t value_var = dict[key]
      */
 
-    void print(std::ostream& out = std::cout) const {
-        for (int i = 0; i < real_size; i++){
-            // if element_arr[i] is empty, overloaded operator, look at LinkedList_dict.h
-            if (element_arr[i] == nullptr) continue;
-            out << element_arr[i] << " ";
-        }
-    }
+    void print(std::ostream& out = std::cout) const;
 
 protected:
     void add_to_array(LinkedList_dict<key_t, value_t>* arr,int arr_size, key_t key, value_t value);
@@ -103,55 +91,23 @@ protected:
 
     template <typename T>
     typename std::enable_if<std::is_integral<T>::value, long long int>::type
-    getHash(T value, int size) const {
-        // hash function works only for positive nums
-        if (value < 0) {
-            value = -value;
-        }
-        long long int result = 0;
-        while (value) {
-            result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
-            result ^= (value & 0xFF);
-            value >>= 8;
-        }
-
-        return result % size;
-    }
+    getHash(T value, int size) const;
+    //hash for integers
 
     template <typename T>
     typename std::enable_if<std::is_floating_point<T>::value, long long int>::type
-    getHash(T value, int size) const {
-        long long int result = 0;
-        unsigned char* bytePtr = reinterpret_cast<unsigned char*>(&value);
-        for (size_t i = 0; i < sizeof(T); ++i) {
-            result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
-            result ^= bytePtr[i];
-        }
-
-        return result % size;
-    }
+    getHash(T value, int size) const;
+    //hash for floats
 
     template <typename T>
     typename std::enable_if<std::is_pointer<T>::value, long long int>::type
-    getHash(T value, int size) const {
-        long long int result = 0;
-        uintptr_t ptr = reinterpret_cast<uintptr_t>(value);
-        unsigned char* bytePtr = reinterpret_cast<unsigned char*>(&ptr);
-        for (size_t i = 0; i < sizeof(ptr); ++i) {
-            result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
-            result ^= bytePtr[i];
-        }
-        return result % size;
-    }
+    getHash(T value, int size) const;
+    //hash for dynamic structures (pointers)
 
-    [[nodiscard]] long long int getHash(const std::string& value, int size) const{
-        long long int result = 0;
-        for (char c : value) {
-            result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
-            result ^= static_cast<unsigned char>(c);
-        }
-        return result % size;
-    }
+    [[nodiscard]] long long int getHash(const std::string& value, int size) const;
+    //hash for std::string
+
+
 
     float get_occupancy();
     /*
@@ -197,11 +153,22 @@ protected:
         dict.print(out);
         return out;
     }
-}; // End of class
+}; // End of the class
 
 
 
 // methods implementation
+
+//public:
+
+template<typename key_t,typename value_t>
+HashDict<key_t, value_t>::HashDict() {
+    real_size = 5;
+    element_count = 0;
+    curr_pow_for_primes = 3;
+    element_arr = new LinkedList_dict<key_t, value_t>[real_size];
+}
+
 template<typename key_t,typename value_t>
 void HashDict<key_t, value_t>::add(key_t key, value_t value){
 
@@ -227,7 +194,7 @@ void HashDict<key_t, value_t>::pop(key_t key){
     } else{
         throw std::logic_error("no elements here!!!");
     }
-} //FIXME: no if else
+}
 
 template<typename key_t,typename value_t>
 bool HashDict<key_t, value_t>::is_in(key_t key){
@@ -250,12 +217,78 @@ const value_t& HashDict<key_t, value_t>::operator[](key_t key) const{
     return element_arr[position][key];
 }
 
+template<typename key_t,typename value_t>
+void HashDict<key_t, value_t>::print(std::ostream& out) const {
+    for (int i = 0; i < real_size; i++){
+        // if element_arr[i] is empty, overloaded operator, look at LinkedList_dict.h
+        if (element_arr[i] == nullptr) continue;
+        out << element_arr[i] << " ";
+    }
+}
 
 
+//protected:
 
 
+// hash functions
+template<typename key_t,typename value_t>
+template <typename T>
+typename std::enable_if<std::is_integral<T>::value, long long int>::type
+HashDict<key_t, value_t>::getHash(T value, int size) const {
+    // hash function works only for positive nums
+    if (value < 0) {
+        value = -value;
+    }
+    long long int result = 0;
+    while (value) {
+        result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
+        result ^= (value & 0xFF);
+        value >>= 8;
+    }
+
+    return result % size;
+}
+
+template<typename key_t,typename value_t>
+template <typename T>
+typename std::enable_if<std::is_floating_point<T>::value, long long int>::type
+HashDict<key_t, value_t>::getHash(T value, int size) const {
+    long long int result = 0;
+    unsigned char* bytePtr = reinterpret_cast<unsigned char*>(&value);
+    for (size_t i = 0; i < sizeof(T); ++i) {
+        result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
+        result ^= bytePtr[i];
+    }
+
+    return result % size;
+}
+
+template<typename key_t,typename value_t>
+template <typename T>
+typename std::enable_if<std::is_pointer<T>::value, long long int>::type
+HashDict<key_t, value_t>::getHash(T value, int size) const {
+    long long int result = 0;
+    uintptr_t ptr = reinterpret_cast<uintptr_t>(value);
+    unsigned char* bytePtr = reinterpret_cast<unsigned char*>(&ptr);
+    for (size_t i = 0; i < sizeof(ptr); ++i) {
+        result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
+        result ^= bytePtr[i];
+    }
+    return result % size;
+}
+
+template<typename key_t,typename value_t>
+long long int HashDict<key_t, value_t>::getHash(const std::string& value, int size) const{
+    long long int result = 0;
+    for (char c : value) {
+        result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
+        result ^= static_cast<unsigned char>(c);
+    }
+    return result % size;
+}
 
 
+// puffer scaling functions
 template<typename key_t,typename value_t>
 void HashDict<key_t, value_t>::add_to_array(LinkedList_dict<key_t, value_t>* arr,int arr_size, key_t key, value_t value){
     int position = HashDict<key_t, value_t>::getHash(key, arr_size);
