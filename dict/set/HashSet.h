@@ -13,7 +13,7 @@
 /**
  * @brief A templated HashSet class implementing a hash set using separate chaining.
  *
- * This class provides functionality to add, check, and remove elements from the set.
+ * This class provides functionality to add, check and remove elements from the set.
  * It automatically resizes when the occupancy exceeds 75% to maintain efficiency.
  *
  * @tparam var_type The type of elements stored in the HashSet.
@@ -160,7 +160,7 @@ protected:
     /**
      * @brief Resizes the hash table by creating a new array with a larger prime size.
      *
-     * Allocates a new array, rehashes existing elements, and replaces the old array.
+     * Allocates a new array, rehashes existing elements and replaces the old array.
      */
     void create_new_elements_arr();
 

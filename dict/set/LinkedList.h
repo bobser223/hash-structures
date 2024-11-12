@@ -346,4 +346,3 @@ void LinkedList<var_type>::find_element_with_var(var_type var, ListEl<var_type>*
 }
 
 #endif //LEARNING_LINKEDLIST_H
-
