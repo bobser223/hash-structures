@@ -19,13 +19,7 @@ protected:
     LinkedList<var_type>* element_arr;
 
 public:
-    HashSet(){
-        real_size = 5;
-        element_count = 0;
-        curr_pow_for_primes = 3;
-        element_arr = new LinkedList<var_type>[real_size];
-        for (int i = 0; i < 5; i++) element_arr[i].first_el = nullptr;
-    }
+    HashSet();
 
     ~HashSet(){
         delete[] element_arr;
@@ -55,78 +49,28 @@ public:
      * @return count of elements
      */
 
-    void print(std::ostream& out = std::cout) const {
-        for (int i = 0; i < real_size; i++){
-            // if element_arr[i] is empty, overloaded operator, look to LinkedList.h
-            if (element_arr[i] == nullptr) continue;
-            out << element_arr[i] << " ";
-        }
-    }
+    void print(std::ostream& out = std::cout) const;
 
 protected:
-    // hash for integers
+
     template <typename T>
     typename std::enable_if<std::is_integral<T>::value, long long int>::type
-    getHash(T value) {
-        // hash function works only for positive nums
-        if (value < 0) {
-            value = -value;
-        }
-        long long int result = 0;
-        while (value) {
-            result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
-            result ^= (value & 0xFF);
-            value >>= 8;
-        }
+    getHash(T value);
+    // hash for integers
 
-
-        return result;
-    }
-
-    // hash for floats
     template <typename T>
     typename std::enable_if<std::is_floating_point<T>::value, long long int>::type
-    getHash(T value) {
-        long long int result = 0;
-        unsigned char* bytePtr = reinterpret_cast<unsigned char*>(&value);
-        for (size_t i = 0; i < sizeof(T); ++i) {
-            result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
-            result ^= bytePtr[i];
-        }
+    getHash(T value);
+    // hash for floats
 
 
-        return result;
-    }
-
-
-    //hash for dynamic structures
     template <typename T>
     typename std::enable_if<std::is_pointer<T>::value, long long int>::type
-    getHash(T value) {
-        long long int result = 0;
-        uintptr_t ptr = reinterpret_cast<uintptr_t>(value);
-        unsigned char* bytePtr = reinterpret_cast<unsigned char*>(&ptr);
-        for (size_t i = 0; i < sizeof(ptr); ++i) {
-            result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
-            result ^= bytePtr[i];
-        }
+    getHash(T value);
+    //hash for dynamic structures (pointers)
 
-
-        return result;
-    }
-
+    long long int getHash(const std::string& value) const;
     //hash for strings
-    long long int getHash(const std::string& value) const{
-        long long int result = 0;
-        for (char c : value) {
-
-            result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
-            result ^= static_cast<unsigned char>(c);
-        }
-
-
-        return result;
-    }
 
     float get_occupancy(){
         if (HashSet<var_type>::real_size == 0) return 0;
@@ -176,6 +120,17 @@ protected:
     }
 }; // end of the class
 
+
+template<typename var_type>
+HashSet<var_type>::HashSet() {
+    real_size = 5;
+    element_count = 0;
+    curr_pow_for_primes = 3;
+    element_arr = new LinkedList<var_type>[real_size];
+    for (int i = 0; i < 5; i++) element_arr[i].first_el = nullptr;
+}
+
+
 template<typename var_type>
 void HashSet<var_type>::add(var_type var){
 
@@ -220,8 +175,84 @@ void HashSet<var_type>::pop(var_type var){
     }
 }
 
+template<typename var_type>
+void HashSet<var_type>::print(std::ostream& out) const {
+    for (int i = 0; i < real_size; i++) {
+        if (element_arr[i] == nullptr) continue;
+        out << element_arr[i] << " ";
+    }
+}
+
 
 //protected
+
+//hash functions
+
+template<typename var_type>
+template <typename T>
+typename std::enable_if<std::is_integral<T>::value, long long int>::type
+HashSet<var_type>::getHash(T value) {
+    // hash function works only for positive nums
+    if (value < 0) {
+        value = -value;
+    }
+    long long int result = 0;
+    while (value) {
+        result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
+        result ^= (value & 0xFF);
+        value >>= 8;
+    }
+
+
+    return result;
+}
+
+
+template<typename var_type>
+template <typename T>
+typename std::enable_if<std::is_floating_point<T>::value, long long int>::type
+HashSet<var_type>::getHash(T value) {
+    long long int result = 0;
+    unsigned char* bytePtr = reinterpret_cast<unsigned char*>(&value);
+    for (size_t i = 0; i < sizeof(T); ++i) {
+        result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
+        result ^= bytePtr[i];
+    }
+
+
+    return result;
+}
+
+template<typename var_type>
+template <typename T>
+typename std::enable_if<std::is_pointer<T>::value, long long int>::type
+HashSet<var_type>::getHash(T value) {
+    long long int result = 0;
+    uintptr_t ptr = reinterpret_cast<uintptr_t>(value);
+    unsigned char* bytePtr = reinterpret_cast<unsigned char*>(&ptr);
+    for (size_t i = 0; i < sizeof(ptr); ++i) {
+        result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
+        result ^= bytePtr[i];
+    }
+
+
+    return result;
+}
+
+template<typename var_type>
+long long int HashSet<var_type>::getHash(const std::string& value) const {
+    long long int result = 0;
+    for (char c : value) {
+
+        result = (result << 5) | (result >> (sizeof(long long int) * 8 - 5));
+        result ^= static_cast<unsigned char>(c);
+    }
+
+
+    return result;
+}
+
+// puffer scaling functions
 template<typename var_type>
 void HashSet<var_type>::create_new_elements_arr() {
     long long new_size = HashSet<var_type>::next_prime();
